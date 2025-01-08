@@ -1,3 +1,4 @@
+```
      _        _                 _     _     
     / \   ___| |_ ___ _ __ ___ (_) __| |___ 
    / _ \ / __| __/ _ \ '__/ _ \| |/ _` / __|
@@ -15,3 +16,4 @@ Controls:
 * UP arrow to accelerate the space ship
 * LEFT and RIGHT arrows to turn the ship
 * SPACE for firing lasers
+```
