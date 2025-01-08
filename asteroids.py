@@ -1,3 +1,24 @@
+"""
+     _        _                 _     _     
+    / \   ___| |_ ___ _ __ ___ (_) __| |___ 
+   / _ \ / __| __/ _ \ '__/ _ \| |/ _` / __|
+  / ___ \\__ \ ||  __/ | | (_) | | (_| \__ \
+ /_/   \_\___/\__\___|_|  \___/|_|\__,_|___/
+                                            
+Asteroids clone by Janne Tompuri
+
+Game play:
+Your goal is to destroy as many asteroids as possible. 
+Each destroyed asteroid gives you 10 points. The game 
+is over when the ship collides with an asteroid.
+
+Controls: 
+* UP arrow to accelerate the space ship
+* LEFT and RIGHT arrows to turn the ship
+* SPACE for firing lasers
+
+"""
+
 import pygame
 from random import randint, uniform
 from math import sin, cos, radians, sqrt
@@ -16,7 +37,7 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Asteroids")
 screen.fill(BACKGROUND_COLOR)
 
-# Load laser sound effect
+# Load sound effect
 laser_sound = pygame.mixer.Sound("shoot.wav")
 asteroid_hit_sound = pygame.mixer.Sound("asteroid_hit.wav")
 asteroid_created = pygame.mixer.Sound("spawn.wav")
