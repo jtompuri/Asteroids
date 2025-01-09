@@ -29,7 +29,7 @@ pygame.init()
 # Constant values
 GREEN = (25, 210, 9)
 BACKGROUND_COLOR = (0, 32, 0)
-SCREEN_WIDTH = 1080
+SCREEN_WIDTH = 12 80
 SCREEN_HEIGHT = 960
 
 # Set up the drawing window
