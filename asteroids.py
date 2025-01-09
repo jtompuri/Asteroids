@@ -61,6 +61,7 @@ clock = pygame.time.Clock()
 
 class Ship:
     '''Class for the player's ship'''
+
     def __init__(self):
         self.position = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
         self.angle = 0
@@ -72,7 +73,10 @@ class Ship:
         self.angle += 5 * direction
 
     def accelerate(self):
+        # Accelerate the ship in the direction it is facing
         new_speed = (self.speed[0] + 0.1 * cos(radians(self.angle)), self.speed[1] + 0.1 * sin(radians(self.angle)))
+        
+        # Limit the speed of the ship
         if sqrt(new_speed[0] ** 2 + new_speed[1] ** 2) < self.max_speed:
             self.speed = new_speed
 
@@ -95,6 +99,7 @@ class Ship:
 
 class Laser:
     '''Class for the laser fired by the ship'''
+
     def __init__(self, position, angle):
         self.position = position
         self.angle = angle
@@ -111,7 +116,9 @@ class Laser:
 
 class Asteroid:
     '''Class for the asteroids'''
+
     def __init__(self):
+        # Randomly select an edge to spawn the asteroid
         edge = randint(0, 3)
         if edge == 0:  # Top edge
             x = randint(0, SCREEN_WIDTH)
@@ -320,7 +327,7 @@ def main_game_loop():
                 pygame.quit()
                 exit()
 
-        ''' Update game state'''
+        '''Update game state'''
 
         # Clear the screen
         screen.fill(BACKGROUND_COLOR)
@@ -355,7 +362,7 @@ def main_game_loop():
             asteroid.update_position()
             asteroid.draw()
 
-        ''' Check for collisions'''
+        '''Check for collisions'''
 
         # Check for collisions between lasers and asteroids
         for laser in lasers:
