@@ -1,4 +1,4 @@
-"""
+'''
      _        _                 _     _     
     / \   ___| |_ ___ _ __ ___ (_) __| |___ 
    / _ \ / __| __/ _ \ '__/ _ \| |/ _` / __|
@@ -17,7 +17,7 @@ Controls:
 * LEFT and RIGHT arrows to turn the ship
 * SPACE for firing lasers
 
-"""
+'''
 
 import pygame
 from random import randint, uniform
@@ -60,6 +60,7 @@ show_text = True
 clock = pygame.time.Clock()
 
 class Ship:
+    '''Class for the player's ship'''
     def __init__(self):
         self.position = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
         self.angle = 0
@@ -93,6 +94,7 @@ class Ship:
         pygame.draw.polygon(screen, GREEN, transformed_ship, 1)
 
 class Laser:
+    '''Class for the laser fired by the ship'''
     def __init__(self, position, angle):
         self.position = position
         self.angle = angle
@@ -108,6 +110,7 @@ class Laser:
         pygame.draw.polygon(screen, GREEN, laser, 1)
 
 class Asteroid:
+    '''Class for the asteroids'''
     def __init__(self):
         edge = randint(0, 3)
         if edge == 0:  # Top edge
@@ -143,6 +146,9 @@ class Asteroid:
         transformed_polygon = translate_polygon(rotated_polygon, self.position)
         pygame.draw.polygon(screen, GREEN, transformed_polygon, 1)
 
+'''Helper functions'''
+
+# Rotate a polygon by an angle
 def rotate_polygon(vertices, angle):
     rotated_vertices = []
     angle_rad = radians(angle)
@@ -152,14 +158,19 @@ def rotate_polygon(vertices, angle):
         rotated_vertices.append((x_new, y_new))
     return rotated_vertices
 
+# Translate a polygon by an offset
 def translate_polygon(vertices, offset):
     dx, dy = offset
     return [(x + dx, y + dy) for x, y in vertices]
 
+# Check if a point is outside the screen boundaries
 def check_screen_boundaries(point):
     return point[0] < 0 or point[0] > SCREEN_WIDTH or point[1] < 0 or point[1] > SCREEN_HEIGHT
 
+# Check if two polygons collide
 def check_collision(polygon1, polygon2):
+
+    # Project a polygon onto an axis
     def project_polygon(polygon, axis):
         min_proj = float('inf')
         max_proj = float('-inf')
@@ -169,6 +180,7 @@ def check_collision(polygon1, polygon2):
             max_proj = max(max_proj, projection)
         return min_proj, max_proj
 
+    # Check if two polygons intersect
     def polygons_intersect(polygon1, polygon2):
         for polygon in [polygon1, polygon2]:
             for i1 in range(len(polygon)):
@@ -184,6 +196,7 @@ def check_collision(polygon1, polygon2):
 
     return polygons_intersect(polygon1, polygon2)
 
+# Generate a random asteroid polygon
 def generate_random_asteroid(size, num_vertices=8):
     angle_step = 360 / num_vertices
     vertices = []
@@ -195,6 +208,7 @@ def generate_random_asteroid(size, num_vertices=8):
         vertices.append((x, y))
     return vertices
 
+# Read and write the hiscore to a file
 def read_hiscore(file_path="hiscore.txt"):
     try:
         with open(file_path, "r") as file:
@@ -206,6 +220,7 @@ def write_hiscore(hiscore, file_path="hiscore.txt"):
     with open(file_path, "w") as file:
         file.write(str(hiscore))
 
+# Draw the score and hiscore
 def draw_scores(score, hiscore):
     score_text = (5 - len(str(score))) * "0" + str(score)
     score_surface = score_font.render(score_text, True, GREEN)
@@ -213,8 +228,11 @@ def draw_scores(score, hiscore):
 
     hiscore_text = "Hi " + (5 - len(str(hiscore))) * "0" + str(hiscore)
     hiscore_surface = score_font.render(hiscore_text, True, GREEN)
-    screen.blit(hiscore_surface, (505, 10))
+    screen.blit(hiscore_surface, (SCREEN_WIDTH - 135, 10))
 
+'''Game loops'''
+
+# Game loop for the start screen
 def start_game_loop():
     global show_text, blink_timer, blink_interval
     start_game = False
@@ -247,8 +265,11 @@ def start_game_loop():
         pygame.display.flip()
         clock.tick(60)
 
+# Main game loop
 def main_game_loop():
     global score, hiscore
+
+    # Initialize game variables
     ship = Ship()
     lasers = []
     asteroids = [Asteroid() for _ in range(10)]
@@ -269,7 +290,10 @@ def main_game_loop():
     button_space = False
 
     while running:
+
         for event in pygame.event.get():
+
+            # Check for key presses
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
                     button_left = True
@@ -291,10 +315,17 @@ def main_game_loop():
                 if event.key == pygame.K_SPACE:
                     button_space = False
 
+            # Check for quit event
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
 
+        ''' Update game state'''
+
+        # Clear the screen
+        screen.fill(BACKGROUND_COLOR)
+
+        # Update and draw ship
         if button_left:
             ship.rotate(-1)
         if button_right:
@@ -308,11 +339,10 @@ def main_game_loop():
                 last_fire = current_time
                 laser_sound.play()
 
-        screen.fill(BACKGROUND_COLOR)
-
         ship.update_position()
         ship.draw()
 
+        # Update and draw lasers
         for laser in lasers:
             laser.update_position()
             if check_screen_boundaries(laser.position):
@@ -320,10 +350,14 @@ def main_game_loop():
             else:
                 laser.draw()
 
+        # Update and draw asteroids
         for asteroid in asteroids:
             asteroid.update_position()
             asteroid.draw()
 
+        ''' Check for collisions'''
+
+        # Check for collisions between lasers and asteroids
         for laser in lasers:
             rotated_laser_polygon = rotate_polygon(laser.polygon, laser.angle)
             translated_laser_polygon = translate_polygon(rotated_laser_polygon, laser.position)
@@ -337,6 +371,7 @@ def main_game_loop():
                     asteroid_hit_sound.play()
                     break
 
+        # Check for collisions between ship and asteroids
         current_time = pygame.time.get_ticks()
         if current_time - invincibility_start_time > invincibility_duration:
             rotated_ship_polygon = rotate_polygon(ship.polygon, ship.angle)
@@ -349,6 +384,7 @@ def main_game_loop():
                     explosion_sound.play()
                     break
 
+        # Create new asteroids
         current_time = pygame.time.get_ticks()
         if current_time - asteroid_timer > asteroid_delay:
             asteroids.append(Asteroid())
@@ -357,10 +393,13 @@ def main_game_loop():
             if asteroid_delay > min_asteroid_delay:
                 asteroid_delay *= delay_decrement
 
+        # Draw scores
         draw_scores(score, hiscore)
+        
         pygame.display.flip()
         clock.tick(60)
 
+# Game over loop
 def game_over_loop():
     global show_text, blink_timer, blink_interval, score, hiscore
     new_hiscore = False
@@ -373,24 +412,29 @@ def game_over_loop():
             if event.type == pygame.KEYDOWN:
                 main_game_loop()
 
+        # Clear the screen
         screen.fill(BACKGROUND_COLOR)
 
+        # Draw game over text
         game_over_text = "Game Over"
         text_surface = title_font.render(game_over_text, True, GREEN)
         text_rect = text_surface.get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 50))
         screen.blit(text_surface, text_rect)
 
+        # Check if the score is a new hiscore
         if score > hiscore:
             hiscore = score
             write_hiscore(hiscore)
             new_hiscore = True
 
+        # Draw new hiscore text
         if new_hiscore:
             hiscore_text = "New hiscore"
             hiscore_surface = score_font.render(hiscore_text, True, GREEN)
             hiscore_rect = hiscore_surface.get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2))
             screen.blit(hiscore_surface, hiscore_rect)
 
+        # Blinking text for restarting the game
         current_time = pygame.time.get_ticks()
         if current_time - blink_timer > blink_interval:
             show_text = not show_text
@@ -402,13 +446,17 @@ def game_over_loop():
             restart_rect = restart_surface.get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 50))
             screen.blit(restart_surface, restart_rect)
 
+        # Draw scores
         draw_scores(score, hiscore)
+
         pygame.display.flip()
         clock.tick(60)
 
+# Main function
 def main():
     start_game_loop()
     main_game_loop()
     game_over_loop()
 
+# Run the game
 main()
